@@ -12,29 +12,27 @@
 #include<iostream>
 using std::cout;
 using std::endl;
+using std::wstring;
+using std::string;
 
-// DX
-#include <d2d1.h>	
-#include <dwrite.h>
-#include <d2d1effects.h>
-#include <d2d1helper.h> 
+// Types
+#include "../Types/Types.h"
+
+// DX11
+#include <d3d11.h>
+#include <d3dcompiler.h>
 #include <wrl.h>
 #include <DirectXMath.h>
 using namespace DirectX;
 using namespace Microsoft::WRL;
-
-// 각종 lib
-#pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "windowscodecs.lib")
-#pragma comment(lib, "msimg32.lib") 
-#pragma comment(lib, "d2d1.lib")
-#pragma comment(lib, "dxguid.lib")
-#pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 
 // 각종 define
 #define PI 3.14159265f
-#define SCREEN_WIDTH  1024
-#define SCREEN_HEIGHT 1024
+#define SCREEN_WIDTH 512
+#define SCREEN_HEIGHT 512
+#define CHECK(p) assert(SUCCEEDED(p))
 
 // 디버깅용 콘솔창
 #ifdef _DEBUG
