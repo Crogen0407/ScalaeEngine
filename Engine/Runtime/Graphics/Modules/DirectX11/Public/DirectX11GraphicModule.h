@@ -1,6 +1,8 @@
 #pragma once
 #include "../../IGraphicModule.h"
+#include "../../../Geometry/Vertex.h"
 class GeometryTester;
+
 class DirectX11GraphicModule : public IGraphicModule
 {
 public:
@@ -13,9 +15,13 @@ public:
 
 public:
 	void CreateGeometry();
-	void CreateInputLayout();
+	void CreateInputLayout( );
 	void CreateVS();
 	void CreatePS();
+
+	void CreateSRV();
+	void CreateConstantBuffer();
+
 	void LoadShaderFormFile(const wstring& path, const string& name, const string& version, ComPtr<ID3DBlob>& blob);
 
 public:
@@ -31,17 +37,25 @@ private:
 	// RTV
 	ComPtr<ID3D11RenderTargetView> _renderTargetView = nullptr;
 	
-	// Input layout
-	ComPtr<ID3D11InputLayout> _inputLayout           = nullptr;
-
 	// Misc
 	D3D11_VIEWPORT _viewport = { 0 };
 
 	// Geometry
 	GeometryTester* _geometryTester;
 	ComPtr<ID3D11Buffer> _vertexBuffer;
+	ComPtr<ID3D11Buffer> _indexBuffer;
+
 	ComPtr<ID3D11VertexShader> _vertexShader         = nullptr;
 	ComPtr<ID3DBlob> _vsBlob                         = nullptr;
 	ComPtr<ID3D11PixelShader> _pixelShader           = nullptr;
 	ComPtr<ID3DBlob> _psBlob                         = nullptr;
+
+	// SRV
+	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
+
+	// Input layout
+	ComPtr<ID3D11InputLayout> _inputLayout           = nullptr;
+
+	TransformData _transformData;
+	ComPtr<ID3D11Buffer> _constantBuffer;
 };

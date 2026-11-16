@@ -7,6 +7,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(ScalaeEngine INTERFACE)
 add_library(Scalae::Engine ALIAS ScalaeEngine)
 
+# DirectX
+#-----------------------------------
+add_library(DirectXTex STATIC IMPORTED GLOBAL)
+set_target_properties(DirectXTex PROPERTIES
+    IMPORTED_CONFIGURATIONS "Debug;Release"
+    IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_SOURCE_DIR}/Library/DirectXTex/DirectXTex_debug.lib"
+    IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Library/DirectXTex/DirectXTex.lib"
+    MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
+    MAP_IMPORTED_CONFIG_MINSIZEREL Release
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/Include"
+)
+target_link_libraries(DirectXTex INTERFACE d3d11 dxgi ole32 windowscodecs uuid)
+target_link_libraries(ScalaeEngine INTERFACE DirectXTex)
+#-----------------------------------
+
+
 target_precompile_headers(ScalaeEngine 
     INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Include/pch.h
 )

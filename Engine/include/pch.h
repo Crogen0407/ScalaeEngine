@@ -23,6 +23,8 @@ using std::string;
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <DirectXMath.h>
+#include "DirectXTex.h"
+#include "DirectXTex.inl"
 using namespace DirectX;
 using namespace Microsoft::WRL;
 #pragma comment(lib, "d3d11.lib")
@@ -38,9 +40,14 @@ using namespace Microsoft::WRL;
 #ifdef _DEBUG
 #define new new(_CLIENT_BLOCK, __FILE__, __LINE__)
 #define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 #else
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
+
+#pragma comment(lib, "DirectXTex_debug.lib")
+#else
+#pragma comment(lib, "DirectXTex.lib")
 #endif

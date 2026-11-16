@@ -11,6 +11,9 @@ void DirectX11GraphicModule::Initialize(HWND hWnd)
 	CreateVS();
 	CreateInputLayout();
 	CreatePS();
+
+	CreateSRV();
+	CreateConstantBuffer();
 }
 
 void DirectX11GraphicModule::CeateDeviceAndSwapChain(HWND hWnd)
@@ -78,7 +81,7 @@ void DirectX11GraphicModule::SetViewport()
 void DirectX11GraphicModule::CreateGeometry()
 {
 	_geometryTester = new GeometryTester();
-	_geometryTester->TestGeometry(_device.Get(), _vertexBuffer.GetAddressOf());
+	_geometryTester->TestGeometry(_device.Get(), _vertexBuffer.GetAddressOf(), _indexBuffer.GetAddressOf());
 }
 
 void DirectX11GraphicModule::CreateInputLayout()
@@ -86,7 +89,8 @@ void DirectX11GraphicModule::CreateInputLayout()
 	D3D11_INPUT_ELEMENT_DESC desc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	HRESULT hr;
@@ -105,6 +109,30 @@ void DirectX11GraphicModule::CreatePS()
 {
 	LoadShaderFormFile(L"Default.hlsl", "PS", "ps_5_0", _psBlob);
 	HRESULT hr = _device->CreatePixelShader(_psBlob->GetBufferPointer(), _psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
+	CHECK(hr);
+}
+
+void DirectX11GraphicModule::CreateSRV()
+{
+	DirectX::TexMetadata md;
+	DirectX::ScratchImage img;
+	HRESULT hr = ::LoadFromWICFile(L"stellive.png", WIC_FLAGS_NONE, &md, img);
+	CHECK(hr);
+
+	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
+	CHECK(hr);
+}
+
+void DirectX11GraphicModule::CreateConstantBuffer()
+{
+	D3D11_BUFFER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.ByteWidth = sizeof(TransformData);
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	HRESULT hr = _device->CreateBuffer(&desc, nullptr, _constantBuffer.GetAddressOf());
 	CHECK(hr);
 }
 
@@ -141,21 +169,37 @@ void DirectX11GraphicModule::RenderBegin()
 	// IA
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
+
 	_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+	_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	_deviceContext->IASetInputLayout(_inputLayout.Get());
 	_deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// VS
 	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+	_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 
 	// RS
 
 	// PS
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+	_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
 
 	// OM
 
-	_deviceContext->Draw(_geometryTester->GetVertexCount(), 0);
+	//_deviceContext->Draw(_geometryTester->GetVertexCount(), 0);
+	_deviceContext->DrawIndexed(_geometryTester->GetIndicesCount(), 0, 0);
+
+
+	_transformData.offset.x += 0.0009f;
+	_transformData.offset.y = 0.3f;
+
+	D3D11_MAPPED_SUBRESOURCE subResource;
+	ZeroMemory(&subResource, sizeof(subResource));
+
+	_deviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource);
+	memcpy(subResource.pData, &_transformData, sizeof(_transformData));
+	_deviceContext->Unmap(_constantBuffer.Get(), 0);
 }
 
 void DirectX11GraphicModule::RenderEnd()
