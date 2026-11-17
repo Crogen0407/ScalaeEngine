@@ -31,6 +31,11 @@ file(GLOB_RECURSE SCALAE_RUNTIME_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
+file(GLOB_RECURSE SCALAE_RUNTIME_HEADERS CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
+)
+
 file(GLOB_RECURSE ALL_PUBLIC_DIRS LIST_DIRECTORIES true CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/Runtime/Public"
 )
@@ -52,12 +57,13 @@ message(STATUS "Public dirs: ${MODULE_PUBLIC_DIRS}")
 target_include_directories(ScalaeEngine INTERFACE ${MODULE_PUBLIC_DIRS})
 
 list(FILTER SCALAE_RUNTIME_SOURCES EXCLUDE REGEX "/(build|out|\\.vs|CMakeFiles)/")
+list(FILTER SCALAE_RUNTIME_HEADERS EXCLUDE REGEX "/(build|out|\\.vs|CMakeFiles)/")
 
 set_source_files_properties(${SHADER_FILES} PROPERTIES
     VS_SHADER_MODEL 5.0
 )
 
-add_executable(ScalaeRuntime ${SCALAE_RUNTIME_SOURCES})
+add_executable(ScalaeRuntime ${SCALAE_RUNTIME_SOURCES} ${SCALAE_RUNTIME_HEADERS})
 
 target_compile_definitions(ScalaeRuntime PRIVATE UNICODE _UNICODE)
 target_link_options(ScalaeRuntime PRIVATE -municode)

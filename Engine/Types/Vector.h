@@ -20,6 +20,14 @@ struct Vector2D
 		y -= other.y;
 		return *this;
 	}
+
+	float& operator[](int index)
+	{
+		if (0 == index)
+			return x;
+		else
+			return y;
+	}
 };
 
 struct Vector3D
@@ -55,5 +63,15 @@ struct Vector3D
 		x -= other.x;
 		y -= other.y;
 		return *this;
+	}
+
+	float& operator[](int index)
+	{
+		if (0 == index)
+			return x;
+		else if (1 == index)
+			return y;
+		else
+			return z;
 	}
 };
