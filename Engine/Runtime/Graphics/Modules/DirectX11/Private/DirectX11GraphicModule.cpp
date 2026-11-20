@@ -250,9 +250,16 @@ void DirectX11GraphicModule::RenderBegin()
 	//_deviceContext->Draw(_geometryTester->GetVertexCount(), 0);
 	_deviceContext->DrawIndexed(_geometryTester->GetIndicesCount(), 0, 0);
 
-	
-	//_transformData.offset.x += 0.0009f;
-	//_transformData.offset.y = 0.3f;
+	Matrix4x4 matScale = Matrix4x4::CreateScale(_localScale.x, _localScale.y, _localScale.z);
+	Matrix4x4 matRotation = Matrix4x4::CreateRotationX(_localRotation.x);
+	matRotation *= Matrix4x4::CreateRotationY(_localRotation.y);
+	matRotation *= Matrix4x4::CreateRotationZ(_localRotation.z);
+	Matrix4x4 matTranslation = Matrix4x4::CreateTranslation(_localPosition.x, _localPosition.y, _localPosition.z);
+
+	Matrix4x4 matWorld = matScale * matRotation * matTranslation;
+
+	_transformData.matWorld = matWorld;
+	//_transformData
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));

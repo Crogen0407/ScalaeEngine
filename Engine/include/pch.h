@@ -25,6 +25,7 @@ using std::string;
 #include <DirectXMath.h>
 #include "DirectXTex.h"
 #include "DirectXTex.inl"
+#include "SimpleMath.h"
 using namespace DirectX;
 using namespace Microsoft::WRL;
 #pragma comment(lib, "d3d11.lib")

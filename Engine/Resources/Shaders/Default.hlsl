@@ -1,26 +1,32 @@
 struct VS_INPUT
 {
-    float4 pos : POSITION;
+    float4 position : POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
 };
 
 struct VS_OUTPUT
 {
-    float4 pos : SV_POSITION;
+    float4 position : SV_POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
 };
 
 cbuffer TransformData : register(b0)
 {
-    float4 offset;
+    row_major matrix matWorld;
+    row_major matrix matView;
+    row_major matrix matProjection;
 }
 
 VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.pos = input.pos + offset;
+    float4 position = mul(input.position, matWorld);
+    position = mul(position, matView);
+    position = mul(position, matProjection);
+    
+    output.position = position;
     output.color = input.color;
     output.uv = input.uv;
 

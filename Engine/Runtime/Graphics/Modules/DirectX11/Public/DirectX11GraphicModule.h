@@ -67,4 +67,9 @@ private:
 
 	TransformData _transformData;
 	ComPtr<ID3D11Buffer> _constantBuffer				 = nullptr;
+
+	Vector3D _localPosition = { 0.f, 0.f, 0.f };
+	Vector3D _localRotation = { 0., 0.f, 0.f };
+	Vector3D _localScale = { 1.0f, 1.0f, 1.0f };
+
 };

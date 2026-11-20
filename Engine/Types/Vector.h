@@ -75,3 +75,6 @@ struct Vector3D
 			return z;
 	}
 };
+
+static const Vector3D Zero = { 0.f, 0.f , 0.f };
+static const Vector3D One = { 1.f, 1.f , 1.f };
