@@ -18,6 +18,9 @@ using std::string;
 // Types
 #include "../Types/Types.h"
 
+// Delveloper
+#include "../Sources/Developer/Developers.h"
+
 // DX11
 #include <d3d11.h>
 #include <d3dcompiler.h>
@@ -28,6 +31,7 @@ using std::string;
 #include "SimpleMath.h"
 using namespace DirectX;
 using namespace Microsoft::WRL;
+using namespace std;
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 

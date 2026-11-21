@@ -8,5 +8,5 @@ public:
 	void Update();
 
 private:
-	IGraphicModule* _targetGraphicModule = nullptr;
+	std::shared_ptr<IGraphicModule> _targetGraphicModule = nullptr;
 };

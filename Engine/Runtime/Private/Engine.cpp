@@ -3,7 +3,7 @@
 
 Engine::Engine(HWND hWnd)
 {
-	_targetGraphicModule = new DirectX11GraphicModule();
+	_targetGraphicModule = std::make_shared<DirectX11GraphicModule>();
 	_targetGraphicModule->Initialize(hWnd);
 }
 

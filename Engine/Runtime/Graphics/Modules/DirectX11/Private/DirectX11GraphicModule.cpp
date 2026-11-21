@@ -7,10 +7,9 @@ void DirectX11GraphicModule::Initialize(HWND hWnd)
 	CreateRenderTargetView();
 	SetViewport();
 
-	CreateGeometry();
 	CreateVS();
-	CreateInputLayout();
 	CreatePS();
+	CreateGeometry();
 
 	CreateRasterizerState();
 	CreateSamplerState();
@@ -73,32 +72,18 @@ void DirectX11GraphicModule::CreateRenderTargetView()
 
 void DirectX11GraphicModule::SetViewport()
 {
-	_viewport.TopLeftX = 0;
-	_viewport.TopLeftY = 0;
+	_viewport.TopLeftX = 0.f;
+	_viewport.TopLeftY = 0.f;
 	_viewport.Width = static_cast<float>(SCREEN_WIDTH);
 	_viewport.Height = static_cast<float>(SCREEN_HEIGHT);
-	_viewport.MinDepth = 0.0f;
-	_viewport.MaxDepth = 1.0f;
+	_viewport.MinDepth = 0.f;
+	_viewport.MaxDepth = 1.f;
 }
 
 void DirectX11GraphicModule::CreateGeometry()
 {
 	_geometryTester = new GeometryTester();
-	_geometryTester->TestGeometry(_device.Get(), _vertexBuffer.GetAddressOf(), _indexBuffer.GetAddressOf());
-}
-
-void DirectX11GraphicModule::CreateInputLayout()
-{
-	D3D11_INPUT_ELEMENT_DESC desc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	HRESULT hr;
-	hr = _device->CreateInputLayout(desc, ARRAYSIZE(desc), _vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), _inputLayout.GetAddressOf());
-	CHECK(hr);
+	_geometryTester->TestGeometry(_device, _vsBlob);
 }
 
 void DirectX11GraphicModule::CreateVS()
@@ -218,7 +203,7 @@ void DirectX11GraphicModule::LoadShaderFormFile(const wstring& path, const strin
 void DirectX11GraphicModule::RenderBegin()
 {
 	// Clear the render target view
-	const float clearColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f }; // RGBA
+	const Color clearColor = { 0.0f, 0.2f, 0.4f, 1.0f }; // RGBA
 	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), clearColor);
 	_deviceContext->RSSetViewports(1, &_viewport);
@@ -227,9 +212,9 @@ void DirectX11GraphicModule::RenderBegin()
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
-	_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-	_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	_deviceContext->IASetInputLayout(_inputLayout.Get());
+	_deviceContext->IASetVertexBuffers(0, 1, _geometryTester->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	_deviceContext->IASetIndexBuffer(_geometryTester->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	_deviceContext->IASetInputLayout(_geometryTester->GetInputLayout().Get());
 	_deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// VS
@@ -272,5 +257,6 @@ void DirectX11GraphicModule::RenderBegin()
 void DirectX11GraphicModule::RenderEnd()
 {
 	// Present the back buffer to the screen
-	_swapChain->Present(1, 0); // VSync enabled
+	HRESULT hr = _swapChain->Present(1, 0); // VSync enabled
+	CHECK(hr);
 }

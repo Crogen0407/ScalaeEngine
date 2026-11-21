@@ -15,7 +15,6 @@ public:
 
 public:
 	void CreateGeometry();
-	void CreateInputLayout( );
 	void CreateVS();
 	void CreatePS();
 
@@ -31,6 +30,10 @@ public:
 	void RenderBegin() override;
 	void RenderEnd() override;
 
+public:
+	ComPtr<ID3D11Device> GetDevice() { return _device; }
+	ComPtr<ID3D11DeviceContext> GetDeviceContext() { return _deviceContext; }
+
 private:
 	// DirectX 11 device and context
 	ComPtr<ID3D11Device> _device						 = nullptr;
@@ -45,16 +48,11 @@ private:
 
 	// Geometry
 	GeometryTester* _geometryTester;
-	ComPtr<ID3D11Buffer> _vertexBuffer					 = nullptr;
-	ComPtr<ID3D11Buffer> _indexBuffer					 = nullptr;
 														 
 	ComPtr<ID3D11VertexShader> _vertexShader			 = nullptr;
 	ComPtr<ID3DBlob> _vsBlob							 = nullptr;
 	ComPtr<ID3D11PixelShader> _pixelShader				 = nullptr;
 	ComPtr<ID3DBlob> _psBlob							 = nullptr;
-														 
-	// Input layout										 
-	ComPtr<ID3D11InputLayout> _inputLayout				 = nullptr;
 														 
 	// RS												 
 	ComPtr<ID3D11RasterizerState> _rasterizerState		 = nullptr;
